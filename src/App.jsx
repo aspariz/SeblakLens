@@ -32,7 +32,7 @@ function App() {
 
     try {
       // Ganti alamat localhost lama kamu menjadi seperti ini:
-const response = await fetch("https://username-seblak-backend.hf.space/hitung-seblak", {
+const response = await fetch("https://be-seblak-lens-nikv.vercel.app/hitung-seblak", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
