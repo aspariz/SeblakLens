@@ -1,6 +1,12 @@
 import React, { useRef, useState, useCallback } from "react";
 import Webcam from "react-webcam";
-import axios from "axios";
+
+/*
+  Catatan Perbaikan:
+  1. Menghapus 'import axios' karena kita menggunakan Fetch API bawaan browser.
+  2. Menambahkan ekstrak string base64 murni dari webcamRef.
+  3. Mengubah pembacaan data response dari 'response.data' menjadi 'await response.json()'.
+*/
 
 function App() {
   const webcamRef = useRef(null);
@@ -31,18 +37,30 @@ function App() {
     setStruk(null);
 
     try {
-      // Ganti alamat localhost lama kamu menjadi seperti ini:
-const response = await fetch("https://be-seblak-lens-nikv.vercel.app/hitung-seblak", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ gambar: gambarBase64 }),
-});
-      setStruk(response.data);
+      // 1. Ekstrak string Base64 murni dari data URI Webcam
+      const gambarBase64 = imageSrc.split(",")[1];
+
+      // 2. Kirim data ke URL backend Vercel yang baru
+      const response = await fetch("https://be-seblak-lens-nikv.vercel.app/hitung-seblak", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ gambar: gambarBase64 }),
+      });
+
+      // 3. Validasi status HTTP response
+      if (!response.ok) {
+        throw new Error("Gagal mengambil data dari server backend Vercel");
+      }
+
+      // 4. Parsing response ke format JSON (cara benar untuk Fetch API)
+      const data = await response.json();
+      setStruk(data);
+
     } catch (error) {
       console.error("Error:", error);
-      alert("Gagal menghubungi AI. Pastikan server Python menyala!");
+      alert("Gagal menghubungi AI. Pastikan server backend Vercel menyala!");
     } finally {
       setLoading(false);
     }
@@ -192,8 +210,6 @@ const styles = {
     fontSize: "14px",
     fontWeight: "600",
   },
-  
-  // Tampilan Selamat Datang (Kamera Mati)
   welcomeContainer: {
     textAlign: "center",
     padding: "30px 10px",
@@ -218,8 +234,6 @@ const styles = {
     boxShadow: "0 4px 15px rgba(39, 174, 96, 0.3)",
     transition: "transform 0.2s",
   },
-
-  // Tampilan Kamera Nyala
   cameraContainer: {
     position: "relative",
     borderRadius: "16px",
@@ -257,8 +271,6 @@ const styles = {
     fontWeight: "bold",
     cursor: "pointer",
   },
-  
-  // Tombol Aksi saat Kamera Nyala
   actionButtons: {
     display: "flex",
     gap: "10px",
@@ -284,8 +296,6 @@ const styles = {
     fontSize: "15px",
     fontWeight: "bold",
   },
-
-  // Tampilan Struk
   receiptCard: {
     marginTop: "25px",
     backgroundColor: "#fafafa",
