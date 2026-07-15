@@ -31,9 +31,14 @@ function App() {
     setStruk(null);
 
     try {
-      const response = await axios.post("http://localhost:5000/hitung-seblak", {
-        gambar: imageSrc
-      });
+      // Ganti alamat localhost lama kamu menjadi seperti ini:
+const response = await fetch("https://username-seblak-backend.hf.space/hitung-seblak", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ gambar: gambarBase64 }),
+});
       setStruk(response.data);
     } catch (error) {
       console.error("Error:", error);
